@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>مذاكرتي | Study Planner</title>
+</head>
+<body>
+    <nav class="navbar">
+        <button class="nav-btn active" onclick="showPage('home')">الرئيسية</button>
+        <button class="nav-btn" onclick="showPage('timer')">المؤقت 🌳</button>
+        <button class="nav-btn" onclick="showPage('shop')">متجر الأشجار 🛒</button>
+        <button class="nav-btn" onclick="showPage('faq')">أسئلة شائعة ❓</button>
+        <button class="nav-btn" onclick="showPage('notes')">المفكرة 📝</button>
+        <button class="nav-btn ai-btn" onclick="showPage('ai')">باسم AI 🤖</button>
+    </nav>
+
+    <button id="langToggle" class="lang-btn">EN</button>
+    <button id="darkModeToggle" class="dark-mode-btn" onclick="toggleDarkMode()">🌙</button>
+
+    <header>
+        <h1>مذاكرتي</h1>
+        <p>خطّط ليومك، وحقّق هدفك!</p>
+    </header>
+
+    <div class="container">
+        <!-- الصفحة الرئيسية -->
+        <div id="home" class="page active">
+            <div class="stats-grid">
+                <div class="stat-box"><div class="stat-number" id="totalSubjects">0</div><div class="stat-label">مواد اليوم</div></div>
+                <div class="stat-box"><div class="stat-number" id="totalNotes">0</div><div class="stat-label">ملاحظاتك</div></div>
+                <div class="stat-box"><div class="stat-number" id="totalTrees">0</div><div class="stat-label">أشجارك 🌳</div></div>
+                <div class="stat-box" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333;"><div class="stat-number" id="userPointsDisplay">0</div><div class="stat-label">نقاطك ⭐</div></div>
+                <div class="stat-box" style="background: linear-gradient(135deg, var(--ai) 0%, #7b1fa2 100%);"><div class="stat-number" id="aiQuestions">0</div><div class="stat-label">محادثات AI 🤖</div></div>
+            </div>
+
+            <section class="card">
+                <h2>جدول المذاكرة اليومي</h2>
+                <div style="overflow-x: auto;">
+                    <table id="scheduleTable">
+                        <thead>
+                            <tr>
+                                <th>إكمال</th>
+                                <th>المادة</th>
+                                <th>الوقت</th>
+                                <th>الملاحظات</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                    <div id="emptyState" class="empty-state hidden">لا توجد مواد مضافة بعد</div>
+                </div>
+                <button id="addRowBtn" class="btn btn-primary">+ إضافة مادة جديدة</button>
+            </section>
+
+            <section class="card quote-box">
+                <p id="motivQuote">جاري التحميل...</p>
+            </section>
+        </div>
+
+        <!-- صفحة المؤقت -->
+        <div id="timer" class="page">
+            <section class="card timer-box">
+                <h2>مؤقّت المذاكرة الذكي</h2>
+                
+                <div class="points-display">
+                    ⭐ نقاطك: <span id="timerPoints">0</span> | 
+                    💰 اجمع النقاط واشترِ أشجاراً!
+                </div>
+
+                <div class="timer-inputs">
+                    <div class="timer-input-group">
+                        <label>ساعات</label>
+                        <input type="number" id="hoursInput" min="0" max="23" value="0">
+                    </div>
+                    <div class="timer-input-group">
+                        <label>دقائق</label>
+                        <input type="number" id="minutesInput" min="0" max="59" value="25">
+                    </div>
+                    <div class="timer-input-group">
+                        <label>ثواني</label>
+                        <input type="number" id="secondsInput" min="0" max="59" value="0">
+                    </div>
+                </div>
+
+                <div class="timer-display" id="timerDisplay">00:25:00</div>
+                <div class="timer-progress">
+                    <div class="timer-progress-bar" id="timerProgress" style="width: 100%"></div>
+                </div>
+                <div class="timer-buttons">
+                    <button id="startTimer" class="btn btn-success">▶️ بدء</button>
+                    <button id="pauseTimer" class="btn btn-warning" style="display:none;">⏸ إيقاف مؤقت</button>
+                    <button id="resetTimer" class="btn btn-danger">🔄 إعادة ضبط</button>
+                </div>
+                <div style="margin-top: 20px; text-align: center; color: #666; font-size: 0.9rem;">
+                    💡 كل دقيقة مذاكرة = 1 نقطة! اجمع النقاط واشترِ أشجاراً جميلة!
+                </div>
+            </section>
+
+            <!-- الحديقة الواقعية المنظمة -->
+            <section class="card garden-container">
+                <div class="sky">
+                    <div class="sun"></div>
+                    <div class="cloud cloud1"></div>
+                    <div class="cloud cloud2"></div>
+                </div>
+                
+                <h2 class="garden-title">🌳 حديقة مذاكرتي</h2>
+                
+                <div class="garden-stats">
+                    <div class="garden-stat">🌳 الأشجار: <span id="gardenTreeCount">0</span></div>
+                    <div class="garden-stat">⏱️ الدقائق: <span id="totalStudyMinutes">0</span></div>
+                    <div class="garden-stat">🔥 السلسلة: <span id="gardenStreak">1</span></div>
+                </div>
+
+                <div class="garden-ground" id="gardenGround">
+                    <div class="grass-hill"></div>
+                    <div class="grass-hill"></div>
+                    <div class="grass-layer"></div>
+                    
+                    <div class="empty-garden" id="emptyGarden">
+                        <div class="empty-garden-icon">🌱</div>
+                        <div>ابدأ المذاكرة لزراعة أول شجرة!</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- صفحة المتجر -->
+        <div id="shop" class="page">
+            <section class="card">
+                <h2>🛒 متجر الأشجار</h2>
+                <div class="points-display" style="font-size: 1.5rem;">
+                    ⭐ نقاطك الحالية: <span id="shopPoints">0</span>
+                </div>
+                <p style="text-align: center; margin: 15px 0; color: #666;">
+                    اجمع النقاط من المؤقت واشترِ أشجاراً لحديقتك! كل شجرة تظهر في حديقتك الخاصة.
+                </p>
+                <div class="shop-grid" id="shopGrid"></div>
+            </section>
+        </div>
+
+        <!-- صفحة الأسئلة الشائعة -->
+        <div id="faq" class="page">
+            <section class="card">
+                <h2>❓ أهم 20 سؤال من الشائعات في تالتة ثانوي</h2>
+                <div id="faqContainer"></div>
+            </section>
+        </div>
+
+        <!-- ==================== المفكرة بأوراق مربعة صغيرة ==================== -->
+        <div id="notes" class="page">
+            <div class="notes-header">
+                <h2>📝 مفكرتي الذكية</h2>
+                <p>دون أفكارك في أوراق ملونة مربعة</p>
+            </div>
+
+            <section class="add-note-section">
+                <textarea 
+                    id="noteInput" 
+                    class="note-input" 
+                    placeholder="✍️ اكتب ملاحظتك هنا..."
+                ></textarea>
+
+                <div class="color-picker-title">اختر لون الورقة:</div>
+                <div class="note-colors">
+                    <div class="color-btn color-red selected" onclick="selectNoteColor(this, 'red')" title="أحمر"></div>
+                    <div class="color-btn color-purple" onclick="selectNoteColor(this, 'purple')" title="بنفسجي"></div>
+                    <div class="color-btn color-teal" onclick="selectNoteColor(this, 'teal')" title="تركواز"></div>
+                    <div class="color-btn color-pink" onclick="selectNoteColor(this, 'pink')" title="وردي"></div>
+                    <div class="color-btn color-yellow" onclick="selectNoteColor(this, 'yellow')" title="أصفر"></div>
+                    <div class="color-btn color-blue" onclick="selectNoteColor(this, 'blue')" title="أزرق"></div>
+                    <div class="color-btn color-green" onclick="selectNoteColor(this, 'green')" title="أخضر"></div>
+                    <div class="color-btn color-orange" onclick="selectNoteColor(this, 'orange')" title="برتقالي"></div>
+                </div>
+
+                <button onclick="addStickyNote()" class="add-note-btn">
+                    <span>📌</span> إضافة الملاحظة
+                </button>
+            </section>
+
+            <section class="card" style="background: transparent; box-shadow: none; padding: 0;">
+                <h2 style="text-align: center; color: #4a5568; margin-bottom: 20px;">📋 ملاحظاتي المعلقة</h2>
+                <div id="notesGrid" class="notes-grid"></div>
+                <div id="emptyNotes" class="empty-notes">
+                    <div class="empty-notes-icon">📭</div>
+                    <div class="empty-notes-text">لا توجد ملاحظات بعد... ابدأ بإضافة أول ملاحظة!</div>
+                </div>
+            </section>
+        </div>
+
+        <!-- باسم AI -->
+        <div id="ai" class="page">
+            <section class="card" style="padding: 0; overflow: hidden;">
+                <div class="ai-container">
+                    <div class="ai-header">
+                        <div class="ai-avatar">🎓</div>
+                        <h3>باسم - مساعدك الدراسي الذكي</h3>
+                        <div class="ai-status">
+                            <span class="status-dot"></span>
+                            <span>متصل الآن - جاهز للمساعدة</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-context">💡 تلميح: يمكنني مساعدتك في المذاكرة، التحفيز، الصحة، الدين، وحتى الدردشة العامة!</div>
+
+                    <div class="ai-suggestions">
+                        <button class="ai-suggestion" onclick="sendSuggestion('مرحبا باسم، كيف حالك؟')">👋 تحية</button>
+                        <button class="ai-suggestion" onclick="sendSuggestion('عندي اختبار قريب وخايف')">😰 خوف من الامتحان</button>
+                        <button class="ai-suggestion" onclick="sendSuggestion('ما عندي طاقة للمذاكرة')">😴 فقدان الطاقة</button>
+                        <button class="ai-suggestion" onclick="sendSuggestion('حاسس إني فاشل')">😔 الإحباط</button>
+                        <button class="ai-suggestion" onclick="sendSuggestion('نصيحتك للنجاح')">🎯 نصيحة ذهبية</button>
+                        <button class="ai-suggestion" onclick="sendSuggestion('احكي لي نكتة')">😂 ترفيه</button>
+                    </div>
+
+                    <div class="ai-chat" id="aiChat"></div>
+
+                    <div class="ai-typing" id="aiTyping">
+                        <span>باسم يفكر</span>
+                        <div class="typing-indicator">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+
+                    <div class="ai-input-area">
+                        <div class="ai-input-container">
+                            <input type="text" id="aiInput" class="ai-input" placeholder="اكتب رسالتك لباسم..." onkeypress="handleKeyPress(event)">
+                            <button onclick="sendMessage()" class="ai-send-btn" id="aiSendBtn">
+                                <span>إرسال</span> 📤
+                            </button>
+                        </div>
+                        
+                        <div class="quick-actions">
+                            <button class="quick-action" onclick="clearChat()">🗑️ مسح المحادثة</button>
+                            <button class="quick-action" onclick="saveChat()">💾 حفظ المحادثة</button>
+                            <button class="quick-action" onclick="showHelp()">❓ مساعدة</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeMotivation()"></div>
+    <div class="motivation-popup" id="motivationPopup">
+        <h3>🎉 أحسنت!</h3>
+        <p id="motivationText"></p>
+        <button class="close-btn" onclick="closeMotivation()">متابعة</button>
+    </div>
+
+    <div id="notification" class="notification hidden"></div>
+
+    <footer>
+        <p>تم صنع هذا الموقع من الطالب باسم</p>
+    </footer>
+    <script src="main.js"></script>
+</body>
+</html>
