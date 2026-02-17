@@ -12,7 +12,7 @@
         <button class="nav-btn" onclick="showPage('shop')">متجر الأشجار 🛒</button>
         <button class="nav-btn" onclick="showPage('faq')">أسئلة شائعة ❓</button>
         <button class="nav-btn" onclick="showPage('notes')">المفكرة 📝</button>
-        <button class="nav-btn ai-btn" onclick="showPage('ai')">باسم AI 🤖</button>
+        <button class="nav-btn ai-btn" onclick="showPage('ai')">OBV AI 🤖</button>
     </nav>
 
     <button id="langToggle" class="lang-btn">EN</button>
@@ -196,7 +196,7 @@
                 <div class="ai-container">
                     <div class="ai-header">
                         <div class="ai-avatar">🎓</div>
-                        <h3>باسم - مساعدك الدراسي الذكي</h3>
+                        <h3>OBV - مساعدك الدراسي الذكي</h3>
                         <div class="ai-status">
                             <span class="status-dot"></span>
                             <span>متصل الآن - جاهز للمساعدة</span>
@@ -206,7 +206,7 @@
                     <div class="ai-context">💡 تلميح: يمكنني مساعدتك في المذاكرة، التحفيز، الصحة، الدين، وحتى الدردشة العامة!</div>
 
                     <div class="ai-suggestions">
-                        <button class="ai-suggestion" onclick="sendSuggestion('مرحبا باسم، كيف حالك؟')">👋 تحية</button>
+                        <button class="ai-suggestion" onclick="sendSuggestion('مرحبا OBV كيف حالك؟')">👋 تحية</button>
                         <button class="ai-suggestion" onclick="sendSuggestion('عندي اختبار قريب وخايف')">😰 خوف من الامتحان</button>
                         <button class="ai-suggestion" onclick="sendSuggestion('ما عندي طاقة للمذاكرة')">😴 فقدان الطاقة</button>
                         <button class="ai-suggestion" onclick="sendSuggestion('حاسس إني فاشل')">😔 الإحباط</button>
@@ -217,7 +217,7 @@
                     <div class="ai-chat" id="aiChat"></div>
 
                     <div class="ai-typing" id="aiTyping">
-                        <span>باسم يفكر</span>
+                        <span>OBV يفكر</span>
                         <div class="typing-indicator">
                             <div class="typing-dot"></div>
                             <div class="typing-dot"></div>
@@ -227,7 +227,7 @@
 
                     <div class="ai-input-area">
                         <div class="ai-input-container">
-                            <input type="text" id="aiInput" class="ai-input" placeholder="اكتب رسالتك لباسم..." onkeypress="handleKeyPress(event)">
+                            <input type="text" id="aiInput" class="ai-input" placeholder="اكتب رسالتك OBV..." onkeypress="handleKeyPress(event)">
                             <button onclick="sendMessage()" class="ai-send-btn" id="aiSendBtn">
                                 <span>إرسال</span> 📤
                             </button>
@@ -254,7 +254,7 @@
     <div id="notification" class="notification hidden"></div>
 
     <footer>
-        <p>تم صنع هذا الموقع من الطالب باسم</p>
+         <p>Made by Omar & Bassem</p>
     </footer>
     <script src="main.js"></script>
 </body>
