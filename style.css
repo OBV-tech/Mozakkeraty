@@ -371,11 +371,12 @@
            ============================================ */
         .quick-actions {
             position: fixed;
+            margin: 2rem 0;
             top: 80px;
             left: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 25px;
             z-index: 999;
         }
 
@@ -436,7 +437,7 @@
         }
 
         .focus-timer {
-            font-size: clamp(4rem, 15vw, 10rem);
+            font-size: clamp(1rem, 10vw, 4rem);
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
             -webkit-background-clip: text;
@@ -456,8 +457,8 @@
         }
 
         .focus-progress-ring {
-            width: 300px;
-            height: 300px;
+            width: 200px;
+            height: 200px;
             margin: 0 auto 3rem;
             position: relative;
         }
@@ -586,8 +587,9 @@
 
         .hero-stat-label {
             font-size: 0.875rem;
-            color: var(--text-muted);
+            color: #000;
         }
+            [data-theme = "dark"] .hero-stat-label{ color: #fff;}
 
         /* ============================================
            LAYOUT
@@ -1322,9 +1324,9 @@
 
         .timer-ring-container {
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 0 auto;
+            width: clamp(250px, 300px, 450px);
+            height: clamp(250px, 300px, 450px);
+            margin: auto;
         }
 
         .timer-ring {
@@ -1350,9 +1352,8 @@
         .timer-display {
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 4rem;
+            left: 7%;
+            font-size: 3.5rem;
             font-weight: 800;
             font-family: 'Courier New', monospace;
             background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
@@ -1535,6 +1536,7 @@
             gap: 0.75rem;
             flex-wrap: wrap;
             justify-content: center;
+            color: #000;
         }
 
         .garden-stat-pill {
@@ -1696,6 +1698,7 @@
             font-weight: 800;
             color: #92400e;
             box-shadow: var(--shadow-lg);
+            margin: 2rem 0;
         }
 
         .shop-grid {
@@ -1717,7 +1720,7 @@
         .shop-item:hover {
             transform: translateY(-8px);
             border-color: var(--primary-500);
-            box-shadow: var(--shadow-xl);
+            box-shadow: 0 7px 15px #DCDCDC;
         }
 
         .shop-item.locked {
@@ -2423,27 +2426,15 @@
             border-top: 1px solid var(--border);
             margin-top: 3rem;
         }
-
-        .footer-heart {
-            color: var(--danger);
-            animation: heartbeat 1.5s ease-in-out infinite;
-            display: inline-block;
-        }
-
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
         /* ============================================
            RESPONSIVE
            ============================================ */
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .mobile-menu-btn { display: flex; }
-            .quick-actions { top: 70px; left: 10px; }
+            .quick-actions { top: px; left: 10px; }
             .hero { margin-top: 60px; padding: 2rem 1rem; }
-            .timer-display { font-size: 3rem; }
+            .timer-display { font-size: 3rem; transform: translate(-80%, -50%); }
             .timer-ring-container { width: 250px; height: 250px; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .garden-scene { height: 400px; }
@@ -2457,6 +2448,10 @@
             .timer-stats { flex-direction: column; gap: 1rem; }
             .shop-grid { grid-template-columns: 1fr; }
             .notes-grid { grid-template-columns: 1fr; }
+            .garden-scene { height: 550px; margin: 2rem 0;}
+        }
+        @media (min-width: 769px) {
+            .timer-display { transform: translate(-5%, -5%); }
         }
 
         /* Utility */
