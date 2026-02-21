@@ -2,64 +2,116 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#2c9c69">
-    <meta name="description" content="تطبيق مذاكرتي - خطط لدراستك، حقق أهدافك، ابنِ حديقتك">
-    <title>مذاكرتي Pro | Study Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="مذاكرتي Pro - منصة الدراسة الذكية المتكاملة">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="مذاكرتي Pro">
+    <title>مذاكرتي Pro | منصة الدراسة المتقدمة</title>
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi2KfZhNmF2KfYs9mE2KkgUHJvIiwic2hvcnRfbmFtZSI6Itin2YTZhdin2LPZhNipIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGZhZmMiLCJ0aGVtZV9jb2xvciI6IiMyYzljNjkifQ==">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi2KfZhNmF2KfYs9mE2KkgUHJvIiwic2hvcnRfbmFtZSI6Itin2YTZhdin2LPZhNipIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGZhZmMiLCJ0aGVtZV9jb2xvciI6IiM2MzY2ZjEiLCJpY29ucyI6W3sic3JjIjoiaWNvbi0xOTJ4MTkyLnBuZyIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%236366f1' width='192' height='192' rx='40'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle'%3E🌱%3C/text%3E%3C/svg%3E">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Loading Screen -->
+    <!-- Loading Screen -->
     <div class="loading-screen" id="loading-screen">
         <div class="loading-logo">🌱</div>
-        <div class="loading-text">جاري تحميل مذاكرتي...</div>
-        <div class="loading-bar">
+        <div class="loading-brand">مذاكرتي Pro</div>
+        <div class="loading-tagline">منصة الدراسة الذكية المتكاملة</div>
+        <div class="loading-bar-container">
             <div class="loading-progress" id="loading-progress"></div>
         </div>
+        <div class="loading-status" id="loading-status">جاري التحميل...</div>
     </div>
-<script>
-let progress = 0;
-let screen = document.getElementById("loading-screen");
 
-setInterval(() => {
-  progress += 5;
-  if (progress >= 100) {
-    screen.style.display = "none";
-  }
-}, 100);
-</script>
+    <!-- Auth Screen -->
+    <div class="auth-screen hidden" id="auth-screen">
+        <div class="auth-container">
+            <div class="auth-logo">🌱</div>
+            <div class="auth-title">مذاكرتي Pro</div>
+            <div class="auth-subtitle">انضم إلى آلاف الطلاب وحقق التفوق</div>
+            
+            <button class="auth-btn" onclick="app.signInWithGoogle()">
+                <span>🔍</span> الدخول بحساب Google
+            </button>
+            
+            <div class="auth-divider">أو</div>
+            
+            <input type="email" class="auth-input" placeholder="البريد الإلكتروني" id="auth-email" autocomplete="email">
+            <input type="password" class="auth-input" placeholder="كلمة المرور" id="auth-password" autocomplete="current-password">
+            
+            <button class="auth-btn" onclick="app.signInWithEmail()">
+                <span>📧</span> تسجيل الدخول
+            </button>
+            
+            <p style="margin-top: 1rem; font-size: 0.875rem;">
+                ليس لديك حساب؟ <a href="#" class="auth-link" onclick="app.showSignUp()">سجل الآن</a>
+            </p>
+            
+            <button class="auth-btn google" onclick="app.skipAuth()" style="margin-top: 1rem;">
+                <span>👤</span> تخطي (وضع الضيف)
+            </button>
+        </div>
+    </div>
 
     <!-- App Container -->
     <div class="app-container hidden" id="app">
         
-        <!-- Background Canvases -->
+        <!-- Ambient Background -->
+        <div class="ambient-bg">
+            <div class="ambient-orb"></div>
+            <div class="ambient-orb"></div>
+            <div class="ambient-orb"></div>
+        </div>
+        
         <canvas class="particles-canvas" id="particles-canvas"></canvas>
-        <canvas class="confetti-canvas" id="confetti-canvas"></canvas>
 
         <!-- Focus Mode Overlay -->
         <div class="focus-overlay" id="focus-overlay">
             <div class="focus-content">
+                <div class="focus-breathing" id="focus-breathing">
+                    <span style="font-size: 4rem;">🧘</span>
+                </div>
                 <div class="focus-timer" id="focus-timer">25:00</div>
                 <p class="focus-quote" id="focus-quote">"التركيز هو مفتاح النجاح"</p>
-                <svg width="0" height="0">
-                    <defs>
-                        <linearGradient id="focusGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#2c9c69"/>
-                            <stop offset="100%" stop-color="#4a90e2"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <div class="focus-progress-ring">
-                    <svg viewBox="0 0 100 100">
-                        <circle class="focus-ring-bg" cx="50" cy="50" r="45"/>
-                        <circle class="focus-ring-progress" id="focus-ring" cx="50" cy="50" r="45"/>
-                    </svg>
+                
+                <div class="focus-stats">
+                    <div class="focus-stat">
+                        <span class="focus-stat-value" id="focus-sessions">0</span>
+                        <span class="focus-stat-label">جلسات</span>
+                    </div>
+                    <div class="focus-stat">
+                        <span class="focus-stat-value" id="focus-minutes">0</span>
+                        <span class="focus-stat-label">دقائق</span>
+                    </div>
+                    <div class="focus-stat">
+                        <span class="focus-stat-value" id="focus-streak">0</span>
+                        <span class="focus-stat-label">أيام متتالية</span>
+                    </div>
                 </div>
-                <button class="exit-focus-btn" onclick="app.toggleFocusMode()">خروج من وضع التركيز</button>
+                
+                <div class="focus-controls">
+                    <button class="focus-btn primary" onclick="app.toggleFocusMode()">
+                        <span>🎯</span> إنهاء الجلسة
+                    </button>
+                    <button class="focus-btn" onclick="app.pauseFocus()">
+                        <span>⏸️</span> إيقاف مؤقت
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -68,12 +120,15 @@ setInterval(() => {
             <div class="nav-container">
                 <a href="#" class="nav-logo" onclick="app.navigate('home')">
                     <span class="logo-icon">🌱</span>
-                    <span>مذاكرتي</span>
+                    <span>مذاكرتي Pro</span>
                 </a>
                 
                 <div class="nav-links">
                     <button class="nav-btn active" data-page="home" onclick="app.navigate('home')">
                         <span>🏠</span> الرئيسية
+                    </button>
+                    <button class="nav-btn analytics-btn" data-page="analytics" onclick="app.navigate('analytics')">
+                        <span>📊</span> التحليلات
                     </button>
                     <button class="nav-btn" data-page="timer" onclick="app.navigate('timer')">
                         <span>⏱️</span> المؤقت
@@ -84,76 +139,99 @@ setInterval(() => {
                     <button class="nav-btn" data-page="notes" onclick="app.navigate('notes')">
                         <span>📝</span> المفكرة
                     </button>
-                    <button class="nav-btn" data-page="faq" onclick="app.navigate('faq')">
-                        <span>❓</span> الأسئلة
-                    </button>
                     <button class="nav-btn ai-btn" data-page="ai" onclick="app.navigate('ai')">
                         <span>🤖</span> OBV
                     </button>
                 </div>
 
-                <button class="mobile-menu-btn" onclick="app.toggleDrawer()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                <div class="user-menu">
+                    <div class="xp-badge" onclick="app.showAchievements()">
+                        <span>⭐</span>
+                        <span id="nav-xp">0</span>
+                    </div>
+                    <div class="level-badge" id="nav-level">1</div>
+                    <button class="avatar-btn" onclick="app.toggleUserMenu()">
+                        <span id="user-avatar">👤</span>
+                        <span class="avatar-status"></span>
+                    </button>
+                    <button class="mobile-menu-btn" onclick="app.toggleDrawer()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
             </div>
         </nav>
 
-<!-- Mobile Drawer -->
+        <!-- Mobile Drawer -->
         <div class="drawer-overlay" id="drawer-overlay" onclick="app.toggleDrawer()"></div>
         <div class="nav-drawer" id="nav-drawer">
             <div class="drawer-header">
-                <span class="drawer-logo">🌱 مذاكرتي</span>
+                <span class="drawer-logo">🌱 مذاكرتي Pro</span>
                 <button class="drawer-close" onclick="app.toggleDrawer()">✕</button>
             </div>
             <div class="drawer-links">
                 <a href="#" class="drawer-link active" data-page="home" onclick="app.navigate('home')">🏠 الرئيسية</a>
+                <a href="#" class="drawer-link" data-page="analytics" onclick="app.navigate('analytics')">📊 التحليلات</a>
                 <a href="#" class="drawer-link" data-page="timer" onclick="app.navigate('timer')">⏱️ المؤقت</a>
                 <a href="#" class="drawer-link" data-page="shop" onclick="app.navigate('shop')">🛒 المتجر</a>
                 <a href="#" class="drawer-link" data-page="notes" onclick="app.navigate('notes')">📝 المفكرة</a>
-                <a href="#" class="drawer-link" data-page="faq" onclick="app.navigate('faq')">❓ الأسئلة</a>
                 <a href="#" class="drawer-link" data-page="ai" onclick="app.navigate('ai')">🤖 OBV</a>
+                <a href="#" class="drawer-link" data-page="achievements" onclick="app.navigate('achievements')">🏆 الإنجازات</a>
+                <a href="#" class="drawer-link" data-page="settings" onclick="app.navigate('settings')">⚙️ الإعدادات</a>
             </div>
         </div>
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-            <button class="action-btn dark-mode" onclick="app.toggleDarkMode()" title="الوضع الليلي">
+            <button class="action-btn dark-mode" onclick="app.toggleDarkMode()" data-tooltip="الوضع الليلي">
                 <span id="dark-mode-icon">🌙</span>
             </button>
-            <button class="action-btn sound" onclick="app.toggleSound()" title="الصوت">
+            <button class="action-btn sound" onclick="app.toggleSound()" data-tooltip="الصوت">
                 <span id="sound-icon">🔊</span>
             </button>
-            <button class="action-btn focus" onclick="app.toggleFocusMode()" title="وضع التركيز">
+            <button class="action-btn focus" onclick="app.toggleFocusMode()" data-tooltip="وضع التركيز">
                 <span>🎯</span>
+            </button>
+            <button class="action-btn music" onclick="app.toggleMusic()" data-tooltip="موسيقى التركيز">
+                <span id="music-icon">🎵</span>
+            </button>
+            <button class="action-btn notifications" onclick="app.toggleNotifications()" data-tooltip="الإشعارات">
+                <span id="notifications-icon">🔔</span>
             </button>
         </div>
 
         <!-- Hero -->
         <header class="hero">
-            <div class="hero-background">
-                <div class="hero-gradient"></div>
-            </div>
             <div class="hero-content">
+                <div class="hero-badge">
+                    <span>✨</span>
+                    <span>الإصدار 2.0 Pro - تجربة دراسية متكاملة</span>
+                </div>
                 <h1 class="hero-title">
-                    <span class="title-word">خطّط</span>
-                    <span class="title-word">لـ</span>
-                    <span class="title-word">مستقبلك</span>
+                    <span class="title-gradient">خطّط</span>
+                    <span>لـ</span>
+                    <span class="title-gradient">مستقبلك</span>
                 </h1>
-                <p class="hero-subtitle" id="hero-subtitle">ابدأ رحلتك نحو التفوق الدراسي</p>
+                <p class="hero-subtitle" id="hero-subtitle">
+                    منصة ذكية تجمع بين الذكاء الاصطناعي، التحليلات المتقدمة، والجيميفيكيشن
+                </p>
                 <div class="hero-stats" id="hero-stats">
-                    <div class="hero-stat">
+                    <div class="hero-stat-card">
                         <span class="hero-stat-value" id="hero-streak">0</span>
-                        <span class="hero-stat-label">أيام متتالية</span>
+                        <span class="hero-stat-label">أيام متتالية 🔥</span>
                     </div>
-                    <div class="hero-stat">
+                    <div class="hero-stat-card">
                         <span class="hero-stat-value" id="hero-points">0</span>
-                        <span class="hero-stat-label">نقطة</span>
+                        <span class="hero-stat-label">نقطة XP ⭐</span>
                     </div>
-                    <div class="hero-stat">
+                    <div class="hero-stat-card">
+                        <span class="hero-stat-value" id="hero-level">1</span>
+                        <span class="hero-stat-label">المستوى 🏆</span>
+                    </div>
+                    <div class="hero-stat-card">
                         <span class="hero-stat-value" id="hero-trees">0</span>
-                        <span class="hero-stat-label">شجرة</span>
+                        <span class="hero-stat-label">شجرة 🌳</span>
                     </div>
                 </div>
             </div>
@@ -164,186 +242,305 @@ setInterval(() => {
             
             <!-- Home Page -->
             <section class="page active" id="page-home">
-                <div class="streak-section">
-                    <div class="streak-card">
-                        <div class="streak-flame">🔥</div>
-                        <div class="streak-number" id="streak-number">0</div>
-                        <div class="streak-label">يوم متتالي من المذاكرة</div>
-                        <div class="streak-progress">
-                            <div class="streak-bar">
-                                <div class="streak-fill" id="streak-fill" style="width: 0%"></div>
+                <!-- Level Card -->
+                <div class="level-card">
+                    <div class="level-header">
+                        <div class="level-info">
+                            <div class="level-avatar" id="level-avatar">🌱</div>
+                            <div class="level-details">
+                                <h3 id="level-title">بستاني مبتدئ</h3>
+                                <p id="level-subtitle">المستوى الحالي</p>
                             </div>
-                            <div class="streak-target">الهدف: 7 أيام</div>
+                        </div>
+                        <div class="level-badge-large" id="level-display">LVL 1</div>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-label">
+                            <span>التقدم للمستوى التالي</span>
+                            <span id="xp-text">0 / 100 XP</span>
+                        </div>
+                        <div class="xp-bar">
+                            <div class="xp-fill" id="xp-fill" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="stats-grid" id="stats-grid">
-                    <div class="stat-card">
-                        <span class="stat-icon">📚</span>
-                        <div class="stat-value" id="stat-subjects">0</div>
-                        <div class="stat-label">مواد اليوم</div>
+                <!-- Streak Section -->
+                <div class="streak-hero">
+                    <div class="freeze-indicator hidden" id="freeze-indicator">
+                        <span>❄️</span>
+                        <span>Streak Freeze نشط</span>
                     </div>
-                    <div class="stat-card">
-                        <span class="stat-icon">📝</span>
-                        <div class="stat-value" id="stat-notes">0</div>
-                        <div class="stat-label">ملاحظات</div>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-icon">🌳</span>
-                        <div class="stat-value" id="stat-trees">0</div>
-                        <div class="stat-label">أشجار</div>
-                    </div>
-                    <div class="stat-card points">
-                        <span class="stat-icon">⭐</span>
-                        <div class="stat-value" id="stat-points">0</div>
-                        <div class="stat-label">نقاط</div>
-                    </div>
-                    <div class="stat-card ai">
-                        <span class="stat-icon">🤖</span>
-                        <div class="stat-value" id="stat-ai">0</div>
-                        <div class="stat-label">محادثات</div>
-                    </div>
-                    <div class="stat-card streak">
-                        <span class="stat-icon">🔥</span>
-                        <div class="stat-value" id="stat-best-streak">0</div>
-                        <div class="stat-label">أفضل سلسلة</div>
+                    <div class="streak-flame-main">🔥</div>
+                    <div class="streak-number-pro" id="streak-number">0</div>
+                    <div class="streak-label-pro">يوم متتالي من المذاكرة</div>
+                    <div class="streak-badges">
+                        <div class="streak-badge">
+                            <span>🏆</span>
+                            <span>أفضل سلسلة: <span id="best-streak">0</span></span>
+                        </div>
+                        <div class="streak-badge">
+                            <span>⏰</span>
+                            <span>الهدف اليومي: <span id="daily-goal">30</span> دقيقة</span>
+                        </div>
+                        <div class="streak-badge">
+                            <span>🎯</span>
+                            <span>الإنجازات: <span id="achievements-count">0</span></span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card progress-card">
+                <!-- Stats Grid -->
+                <div class="stats-grid-pro" id="stats-grid">
+                    <div class="stat-card-pro">
+                        <span class="stat-icon-pro">📚</span>
+                        <div class="stat-value-pro" id="stat-subjects">0</div>
+                        <div class="stat-label-pro">مواد اليوم</div>
+                    </div>
+                    <div class="stat-card-pro purple">
+                        <span class="stat-icon-pro">🤖</span>
+                        <div class="stat-value-pro" id="stat-ai">0</div>
+                        <div class="stat-label-pro">محادثات AI</div>
+                    </div>
+                    <div class="stat-card-pro green">
+                        <span class="stat-icon-pro">🌳</span>
+                        <div class="stat-value-pro" id="stat-trees">0</div>
+                        <div class="stat-label-pro">أشجار الحديقة</div>
+                    </div>
+                    <div class="stat-card-pro gold">
+                        <span class="stat-icon-pro">⭐</span>
+                        <div class="stat-value-pro" id="stat-points">0</div>
+                        <div class="stat-label-pro">نقاط XP</div>
+                    </div>
+                    <div class="stat-card-pro red">
+                        <span class="stat-icon-pro">⏱️</span>
+                        <div class="stat-value-pro" id="stat-minutes">0</div>
+                        <div class="stat-label-pro">دقائق اليوم</div>
+                    </div>
+                    <div class="stat-card-pro">
+                        <span class="stat-icon-pro">📝</span>
+                        <div class="stat-value-pro" id="stat-notes">0</div>
+                        <div class="stat-label-pro">ملاحظات</div>
+                    </div>
+                </div>
+
+                <!-- Mood Tracker -->
+                <div class="mood-tracker card">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <span class="card-icon">📊</span>
-                            تقدمك اليومي
+                            <span class="card-icon">😊</span>
+                            كيف حالك اليوم؟
                         </h3>
                     </div>
-                    <div class="progress-circular">
-                        <svg class="progress-svg">
-                            <defs>
-                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#2c9c69"/>
-                                    <stop offset="100%" stop-color="#4a90e2"/>
-                                </linearGradient>
-                            </defs>
-                            <circle class="progress-bg" cx="50" cy="50" r="40"/>
-                            <circle class="progress-circle" id="daily-progress" cx="50" cy="50" r="40"/>
-                        </svg>
-                        <div class="progress-text">
-                            <span class="progress-percent" id="progress-percent">0%</span>
-                            <span class="progress-label">من الهدف</span>
-                        </div>
+                    <div class="mood-options" id="mood-options">
+                        <button class="mood-btn" onclick="app.setMood('amazing', this)">😄</button>
+                        <button class="mood-btn" onclick="app.setMood('good', this)">🙂</button>
+                        <button class="mood-btn" onclick="app.setMood('okay', this)">😐</button>
+                        <button class="mood-btn" onclick="app.setMood('tired', this)">😴</button>
+                        <button class="mood-btn" onclick="app.setMood('stressed', this)">😰</button>
                     </div>
                 </div>
 
-                <div class="challenges-section" id="challenges-section">
-                    <div class="challenges-card">
-                        <div class="challenges-header">
-                            <div class="challenges-title">
+                <!-- Challenges -->
+                <div class="challenges-section-pro">
+                    <div class="challenges-card-pro">
+                        <div class="challenges-header-pro">
+                            <div class="challenges-title-pro">
                                 <span>🎯</span>
                                 تحديات اليوم
                             </div>
-                            <span id="challenges-date"></span>
+                            <span class="challenge-progress" id="challenge-progress">0/3</span>
                         </div>
                         <div id="challenges-list"></div>
                     </div>
                 </div>
 
-                <div class="card chart-card">
+                <!-- Goals -->
+                <div class="goals-section card">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <span class="card-icon">📈</span>
-                            ساعات المذاكرة هذا الأسبوع
+                            <span class="card-icon">🎯</span>
+                            أهدافي
                         </h3>
+                        <button class="btn-icon" onclick="app.addGoal()">➕</button>
                     </div>
-                    <div class="chart-container" id="weekly-chart"></div>
-                </div>
-                <div class="quick-bar">
-                    <button class="quick-btn" onclick="app.exportData()">
-                        <span>💾</span> حفظ
-                    </button>
-                    <button class="quick-btn" onclick="app.importData()">
-                        <span>📂</span> استرجاع
-                    </button>
-                    <button class="quick-btn" onclick="app.shareProgress()">
-                        <span>📤</span> مشاركة
-                    </button>
-                    <button class="quick-btn" onclick="app.showAchievements()">
-                        <span>🏆</span> إنجازاتي
-                    </button>
+                    <div id="goals-list"></div>
                 </div>
 
-                <div class="card schedule-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <span class="card-icon">📅</span>
-                            جدول اليوم
-                        </h3>
-                        <button class="btn-icon" onclick="app.addScheduleItem()" title="إضافة مادة">➕</button>
-                    </div>
-                    <div class="schedule-container">
-                        <div class="schedule-empty" id="schedule-empty">
-                            <div class="empty-icon">📚</div>
-                            <p>لا توجد مواد اليوم</p>
-                            <button class="btn-primary" onclick="app.addScheduleItem()">أضف أول مادة</button>
+                <!-- ✅ Study Schedule Pro - تم إصلاح تنسيقه -->
+                <div class="schedule-pro-card">
+                    <div class="schedule-header-pro">
+                        <div class="schedule-title-pro">
+                            <div class="schedule-icon-pro">📅</div>
+                            <div>
+                                <h3>جدول المذاكرة الذكي</h3>
+                                <p id="schedule-date">اليوم: --</p>
+                            </div>
                         </div>
-                        <div class="schedule-list hidden" id="schedule-list"></div>
+                        <div class="schedule-actions-pro">
+                            <button class="schedule-btn-pro" onclick="app.showScheduleTemplates()">📋</button>
+                            <button class="schedule-btn-pro" onclick="app.clearCompletedTasks()">🧹</button>
+                            <button class="schedule-btn-pro primary" onclick="app.addScheduleItemPro()">➕</button>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="schedule-progress-container">
+                        <div class="schedule-progress-info">
+                            <span id="schedule-progress-text">0/0 مواد</span>
+                            <span id="schedule-progress-percent">0%</span>
+                        </div>
+                        <div class="schedule-progress-bar">
+                            <div class="schedule-progress-fill" id="schedule-progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Tabs -->
+                    <div class="schedule-filters-pro">
+                        <button class="schedule-filter active" onclick="app.filterSchedule('all')">الكل</button>
+                        <button class="schedule-filter" onclick="app.filterSchedule('pending')">⏳ قيد الانتظار</button>
+                        <button class="schedule-filter" onclick="app.filterSchedule('completed')">✅ مكتمل</button>
+                        <button class="schedule-filter" onclick="app.filterSchedule('priority')">🔥 أولوية</button>
+                    </div>
+
+                    <!-- Schedule List -->
+                    <div class="schedule-list-pro" id="schedule-list-pro">
+                        <div class="schedule-empty-pro" id="schedule-empty-pro">
+                            <div class="schedule-empty-icon">📚</div>
+                            <h4>لا توجد مواد اليوم</h4>
+                            <p>ابدأ يومك بإضافة مواد للمذاكرة</p>
+                            <button class="btn-primary-pro" onclick="app.addScheduleItemPro()">
+                                <span>➕</span> أضف أول مادة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Daily Summary -->
+                    <div class="schedule-summary-pro" id="schedule-summary" style="display: none;">
+                        <div class="summary-item">
+                            <span class="summary-icon">⏱️</span>
+                            <div>
+                                <div class="summary-value" id="total-study-time">0</div>
+                                <div class="summary-label">دقيقة مذاكرة</div>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-icon">🎯</span>
+                            <div>
+                                <div class="summary-value" id="completed-tasks">0</div>
+                                <div class="summary-label">مهمة مكتملة</div>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-icon">🔥</span>
+                            <div>
+                                <div class="summary-value" id="current-streak">0</div>
+                                <div class="summary-label">أيام متتالية</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="quote-card">
-                    <div class="quote-icon">"</div>
-                    <p class="quote-text" id="quote-text"></p>
-                    <div class="quote-author" id="quote-author"></div>
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">⚡</span>
+                            إجراءات سريعة
+                        </h3>
+                    </div>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn-primary-pro" onclick="app.exportData()">
+                            <span>💾</span> حفظ البيانات
+                        </button>
+                        <button class="btn-secondary-pro" onclick="app.importData()">
+                            <span>📂</span> استرجاع
+                        </button>
+                        <button class="btn-secondary-pro" onclick="app.shareProgress()">
+                            <span>📤</span> مشاركة
+                        </button>
+                        <button class="btn-secondary-pro" onclick="app.navigate('achievements')">
+                            <span>🏆</span> إنجازاتي
+                        </button>
+                    </div>
+                </div>
+            </section> <!-- ✅ إغلاق صحيح لـ page-home -->
+
+            <!-- Analytics Page -->
+            <section class="page" id="page-analytics">
+                <div class="analytics-grid">
+                    <div class="chart-card-large">
+                        <div class="chart-header">
+                            <div class="chart-title">
+                                <span>📈</span>
+                                ساعات المذاكرة
+                            </div>
+                            <div class="chart-filters">
+                                <button class="chart-filter active" onclick="app.setChartPeriod('week')">أسبوع</button>
+                                <button class="chart-filter" onclick="app.setChartPeriod('month')">شهر</button>
+                                <button class="chart-filter" onclick="app.setChartPeriod('year')">سنة</button>
+                            </div>
+                        </div>
+                        <div class="chart-container-pro">
+                            <canvas id="studyChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="heatmap-card">
+                        <div class="chart-title">
+                            <span>🔥</span>
+                            خريطة النشاط
+                        </div>
+                        <div class="heatmap-grid" id="heatmap-grid"></div>
+                    </div>
                 </div>
             </section>
 
             <!-- Timer Page -->
             <section class="page" id="page-timer">
-                <div class="timer-hero">
-                    <h2 class="timer-title">⏱️ مؤقت المذاكرة الذكي</h2>
+                <div class="timer-hero-pro">
+                    <h2 class="timer-title">⏱️ مؤقت Pomodoro المتقدم</h2>
                     
-                    <div class="timer-modes">
-                        <button class="mode-btn active" data-mode="pomodoro" onclick="app.setTimerMode('pomodoro')">
-                            <span class="mode-icon">🍅</span>
-                            <span class="mode-name">بومودورو</span>
-                            <span class="mode-time">25 دقيقة</span>
+                    <div class="timer-modes-pro">
+                        <button class="mode-btn-pro active" data-mode="pomodoro" onclick="app.setTimerMode('pomodoro')">
+                            <span class="mode-icon-pro">🍅</span>
+                            <span class="mode-name-pro">بومودورو</span>
+                            <span class="mode-time-pro">25 دقيقة</span>
                         </button>
-                        <button class="mode-btn" data-mode="shortBreak" onclick="app.setTimerMode('shortBreak')">
-                            <span class="mode-icon">☕</span>
-                            <span class="mode-name">راحة قصيرة</span>
-                            <span class="mode-time">5 دقائق</span>
+                        <button class="mode-btn-pro" data-mode="shortBreak" onclick="app.setTimerMode('shortBreak')">
+                            <span class="mode-icon-pro">☕</span>
+                            <span class="mode-name-pro">راحة قصيرة</span>
+                            <span class="mode-time-pro">5 دقائق</span>
                         </button>
-                        <button class="mode-btn" data-mode="longBreak" onclick="app.setTimerMode('longBreak')">
-                            <span class="mode-icon">🌴</span>
-                            <span class="mode-name">راحة طويلة</span>
-                            <span class="mode-time">15 دقيقة</span>
+                        <button class="mode-btn-pro" data-mode="longBreak" onclick="app.setTimerMode('longBreak')">
+                            <span class="mode-icon-pro">🌴</span>
+                            <span class="mode-name-pro">راحة طويلة</span>
+                            <span class="mode-time-pro">15 دقيقة</span>
                         </button>
-                        <button class="mode-btn" data-mode="custom" onclick="app.setTimerMode('custom')">
-                            <span class="mode-icon">⚙️</span>
-                            <span class="mode-name">مخصص</span>
-                            <span class="mode-time">--</span>
+                        <button class="mode-btn-pro" data-mode="custom" onclick="app.setTimerMode('custom')">
+                            <span class="mode-icon-pro">⚙️</span>
+                            <span class="mode-name-pro">مخصص</span>
+                            <span class="mode-time-pro">--</span>
                         </button>
                     </div>
 
-                    <div class="timer-display-container">
-                        <div class="timer-ring-container">
-                            <svg class="timer-ring">
+                    <div class="timer-display-container-pro">
+                        <div class="timer-ring-container-pro">
+                            <svg class="timer-ring-pro" viewBox="0 0 320 320">
                                 <defs>
-                                    <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-
-                                    <stop offset="0%" stop-color="#2c9c69"/>
-                                        <stop offset="100%" stop-color="#4a90e2"/>
+                                    <linearGradient id="timerGradientPro" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#6366f1"/>
+                                        <stop offset="100%" stop-color="#06b6d4"/>
                                     </linearGradient>
                                 </defs>
-                                <circle class="timer-ring-bg" cx="100" cy="100" r="90"/>
-                                <circle class="timer-ring-progress" id="timer-ring" cx="100" cy="100" r="90"/>
+                                <circle class="timer-ring-bg-pro" cx="160" cy="160" r="150"/>
+                                <circle class="timer-ring-progress-pro" id="timer-ring" cx="160" cy="160" r="150"/>
                             </svg>
-                            <div class="timer-display" id="timer-display">25:00</div>
+                            <div class="timer-display-pro" id="timer-display">25:00</div>
                         </div>
                     </div>
 
-                    <div class="timer-inputs" id="timer-inputs">
+                    <div class="timer-inputs-pro hidden" id="timer-inputs">
                         <div class="time-input-group">
                             <label>ساعات</label>
                             <input type="number" id="timer-hours" min="0" max="23" value="0" class="time-input">
@@ -358,202 +555,252 @@ setInterval(() => {
                         </div>
                     </div>
 
-                    <div class="timer-controls">
-                        <button class="timer-btn start" id="btn-start" onclick="app.startTimer()">
+                    <div class="timer-controls-pro">
+                        <button class="timer-btn-pro start" id="btn-start" onclick="app.startTimer()">
                             <span>▶️</span> بدء
                         </button>
-                        <button class="timer-btn pause hidden" id="btn-pause" onclick="app.pauseTimer()">
+                        <button class="timer-btn-pro pause hidden" id="btn-pause" onclick="app.pauseTimer()">
                             <span>⏸️</span> إيقاف
                         </button>
-                        <button class="timer-btn reset" onclick="app.resetTimer()">
+                        <button class="timer-btn-pro reset" onclick="app.resetTimer()">
                             <span>🔄</span> إعادة
                         </button>
                     </div>
 
-                    <div class="timer-stats">
-                        <div class="stat-item">
-                            <span class="stat-value" id="timer-sessions">0</span>
-                            <span class="stat-label">جلسات اليوم</span>
+                    <div class="timer-stats-pro">
+                        <div class="timer-stat-pro">
+                            <span class="timer-stat-value-pro" id="timer-sessions">0</span>
+                            <span class="timer-stat-label-pro">جلسات اليوم</span>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-value" id="timer-minutes-today">0</span>
-                            <span class="stat-label">دقيقة اليوم</span>
+                        <div class="timer-stat-pro">
+                            <span class="timer-stat-value-pro" id="timer-minutes-today">0</span>
+                            <span class="timer-stat-label-pro">دقيقة اليوم</span>
+                        </div>
+                        <div class="timer-stat-pro">
+                            <span class="timer-stat-value-pro" id="timer-total-sessions">0</span>
+                            <span class="timer-stat-label-pro">إجمالي الجلسات</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="garden-section" id="garden-section">
-                    <div class="garden-scene" id="garden-scene">
-                        <div class="garden-sky">
-                            <div class="sun" id="sun"></div>
-                            <div class="moon" id="moon"></div>
-                            <div class="stars" id="stars"></div>
+                <!-- Garden 2.0 -->
+                <div class="garden-section-pro">
+                    <div class="garden-scene-pro theme-day" id="garden-scene">
+                        <div class="garden-sky-pro">
+                            <div class="celestial-body sun-pro" id="sun"></div>
+                            <div class="celestial-body moon-pro" id="moon"></div>
+                            <div class="stars-pro" id="stars"></div>
                         </div>
                         
-                        <div class="garden-ui">
-                            <div class="garden-title-card">
+                        <div class="garden-ui-pro">
+                            <div class="garden-title-card-pro">
                                 <span>🌳</span>
-                                حديقة مذاكرتي
+                                حديقة مذاكرتي 2.0
                             </div>
-                            <div class="garden-stats-bar">
-                                <div class="garden-stat-pill">
+                            <div class="garden-stats-bar-pro">
+                                <div class="garden-stat-pill-pro">
                                     <span>🌳</span>
                                     <span id="garden-tree-count">0</span> شجرة
                                 </div>
-                                <div class="garden-stat-pill">
+                                <div class="garden-stat-pill-pro">
                                     <span>⏱️</span>
                                     <span id="garden-minutes">0</span> دقيقة
-
-                    </div>
+                                </div>
+                                <div class="garden-stat-pill-pro">
+                                    <span>🏠</span>
+                                    <span id="garden-level">مستوى 1</span>
+                                </div>
                             </div>
-                            <div class="garden-controls">
-                                <button class="garden-mode-btn active" onclick="app.setGardenTheme('day')" title="نهار">☀️</button>
-                                <button class="garden-mode-btn" onclick="app.setGardenTheme('sunset')" title="غروب">🌅</button>
-                                <button class="garden-mode-btn" onclick="app.setGardenTheme('night')" title="ليل">🌙</button>
+                            <div class="garden-controls-pro">
+                                <button class="garden-mode-btn-pro active" onclick="app.setGardenTheme('day')">☀️</button>
+                                <button class="garden-mode-btn-pro" onclick="app.setGardenTheme('sunset')">🌅</button>
+                                <button class="garden-mode-btn-pro" onclick="app.setGardenTheme('night')">🌙</button>
+                                <button class="garden-mode-btn-pro" onclick="app.setGardenTheme('winter')">❄️</button>
                             </div>
                         </div>
 
-                        <div class="garden-ground" id="garden-ground"></div>
+                        <div class="weather-overlay" id="weather-overlay"></div>
+                        <div class="garden-ground-pro" id="garden-ground"></div>
                     </div>
                 </div>
             </section>
 
             <!-- Shop Page -->
             <section class="page" id="page-shop">
-                <div class="shop-header">
-                    <div class="points-display">
-                        <span>⭐</span>
+                <div class="shop-header-pro">
+                    <div class="points-display-pro">
+                        <span>💎</span>
                         <span id="shop-points">0</span>
                         نقطة
                     </div>
-                    <p class="shop-subtitle">اجمع النقاط واشترِ أشجاراً لحديقتك!</p>
+                    <p style="margin-top: 1rem; opacity: 0.9;">اجمع النقاط واشترِ أشجاراً وحيوانات أليفة لحديقتك!</p>
                 </div>
-                <div class="shop-grid" id="shop-grid"></div>
+
+                <div class="shop-categories">
+                    <button class="shop-category active" onclick="app.filterShop('all')">الكل</button>
+                    <button class="shop-category" onclick="app.filterShop('trees')">🌳 أشجار</button>
+                    <button class="shop-category" onclick="app.filterShop('pets')">🐾 حيوانات</button>
+                    <button class="shop-category" onclick="app.filterShop('rare')">💎 نادرة</button>
+                </div>
+
+                <div class="shop-grid-pro" id="shop-grid"></div>
             </section>
 
             <!-- Notes Page -->
             <section class="page" id="page-notes">
-                <div class="notes-editor">
-                    <div class="editor-header">
-                        <div class="editor-icon">📝</div>
+                <div class="notes-editor-pro">
+                    <div class="editor-header-pro">
+                        <div class="editor-icon-pro">📝</div>
                         <div>
-                            <div class="editor-title">مفكرتي الذكية</div>
+                            <div class="editor-title-pro">مفكرتي الذكية</div>
                             <div style="color: var(--text-muted); font-size: 0.875rem;">دون أفكارك في أوراق ملونة</div>
                         </div>
                     </div>
                     
-                    <textarea id="note-input" class="note-textarea" placeholder="✍️ اكتب ملاحظتك هنا..."></textarea>
+                    <textarea id="note-input" class="note-textarea-pro" placeholder="✍️ اكتب ملاحظتك هنا..."></textarea>
                     
-                    <div class="color-picker" id="color-picker">
-                        <div class="color-option note-red selected" onclick="app.selectNoteColor('red', this)"></div>
-                        <div class="color-option note-purple" onclick="app.selectNoteColor('purple', this)"></div>
-                        <div class="color-option note-teal" onclick="app.selectNoteColor('teal', this)"></div>
-                        <div class="color-option note-pink" onclick="app.selectNoteColor('pink', this)"></div>
-                        <div class="color-option note-yellow" onclick="app.selectNoteColor('yellow', this)"></div>
-                        <div class="color-option note-blue" onclick="app.selectNoteColor('blue', this)"></div>
-                        <div class="color-option note-green" onclick="app.selectNoteColor('green', this)"></div>
-                        <div class="color-option note-orange" onclick="app.selectNoteColor('orange', this)"></div>
+                    <div class="color-picker-pro" id="color-picker">
+                        <div class="color-option-pro note-red-pro selected" onclick="app.selectNoteColor('red', this)"></div>
+                        <div class="color-option-pro note-purple-pro" onclick="app.selectNoteColor('purple', this)"></div>
+                        <div class="color-option-pro note-teal-pro" onclick="app.selectNoteColor('teal', this)"></div>
+                        <div class="color-option-pro note-pink-pro" onclick="app.selectNoteColor('pink', this)"></div>
+                        <div class="color-option-pro note-yellow-pro" onclick="app.selectNoteColor('yellow', this)"></div>
+                        <div class="color-option-pro note-blue-pro" onclick="app.selectNoteColor('blue', this)"></div>
+                        <div class="color-option-pro note-green-pro" onclick="app.selectNoteColor('green', this)"></div>
+                        <div class="color-option-pro note-orange-pro" onclick="app.selectNoteColor('orange', this)"></div>
                     </div>
                     
-                    <button class="btn-primary btn-full" onclick="app.addNote()">
+                    <button class="btn-primary-pro btn-full-pro" onclick="app.addNote()">
                         <span>📌</span> إضافة الملاحظة
                     </button>
                 </div>
 
-                <div class="notes-filter">
-                    <button class="filter-btn active" onclick="app.filterNotes('all')">الكل</button>
-                    <button class="filter-btn" onclick="app.filterNotes('today')">اليوم</button>
-                    <button class="filter-btn" onclick="app.filterNotes('week')">هذا الأسبوع</button>
+                <div class="notes-filter-pro">
+                    <button class="filter-btn-pro active" onclick="app.filterNotes('all')">الكل</button>
+                    <button class="filter-btn-pro" onclick="app.filterNotes('today')">اليوم</button>
+                    <button class="filter-btn-pro" onclick="app.filterNotes('week')">هذا الأسبوع</button>
                 </div>
 
-                <div class="notes-grid" id="notes-grid"></div>
+                <div class="notes-grid-pro" id="notes-grid"></div>
                 <div class="schedule-empty hidden" id="notes-empty">
                     <div class="empty-icon">📭</div>
                     <p>لا توجد ملاحظات بعد</p>
                 </div>
             </section>
 
-            <!-- FAQ Page -->
-
-            <section class="page" id="page-faq">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <span class="card-icon">❓</span>
-                            أسئلة شائعة
-                        </h3>
+            <!-- AI Page -->
+            <section class="page" id="page-ai">
+                <div class="ai-container-pro">
+                    <div class="ai-header-pro">
+                        <div class="ai-avatar-pro">
+                            <div class="avatar-icon-pro">🎓</div>
+                            <div class="avatar-status-pro"></div>
+                        </div>
+                        <div class="ai-name-pro">OBV Pro</div>
+                        <div class="ai-role">مساعدك الدراسي الذكي المتقدم</div>
                     </div>
-                    <div class="faq-list" id="faq-list"></div>
+
+                    <div class="ai-suggestions-pro">
+                        <button class="suggestion-chip-pro" onclick="app.sendAIMessage('مرحبا OBV! اريد تحليل أدائي')">📊 تحليل الأداء</button>
+                        <button class="suggestion-chip-pro" onclick="app.sendAIMessage('اقترح لي جدول مذاكرة')">📅 جدول ذكي</button>
+                        <button class="suggestion-chip-pro" onclick="app.sendAIMessage('توقع درجاتي')">🔮 توقع الدرجات</button>
+                        <button class="suggestion-chip-pro" onclick="app.sendAIMessage('نصائح للتركيز')">🎯 نصائح تركيز</button>
+                        <button class="suggestion-chip-pro" onclick="app.sendAIMessage('مراجعة سريعة')">⚡ مراجعة</button>
+                    </div>
+
+                    <div class="ai-chat-pro" id="ai-chat"></div>
+                    
+                    <div class="typing-indicator-pro hidden" id="typing-indicator">
+                        <div class="typing-dot-pro"></div>
+                        <div class="typing-dot-pro"></div>
+                        <div class="typing-dot-pro"></div>
+                    </div>
+
+                    <div class="ai-input-area-pro">
+                        <div class="ai-input-wrapper-pro">
+                            <input type="text" id="ai-input" class="ai-input-pro" placeholder="اكتب رسالتك..." onkeypress="app.handleAIKeyPress(event)">
+                            <button class="ai-send-btn-pro" onclick="app.sendAIMessage()">إرسال 📤</button>
+                        </div>
+                        <div class="ai-actions-pro">
+                            <button class="ai-action-btn-pro" onclick="app.clearAIChat()">🗑️ مسح</button>
+                            <button class="ai-action-btn-pro" onclick="app.saveAIChat()">💾 حفظ</button>
+                            <button class="ai-action-btn-pro" onclick="app.analyzePerformance()">📊 تحليل</button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- AI Page -->
-            <section class="page" id="page-ai">
-                <div class="ai-container">
-                    <div class="ai-header">
-                        <div class="ai-avatar">
-                            <div class="avatar-icon">🎓</div>
-                            <div class="avatar-status"></div>
-                        </div>
-                        <div class="ai-name">OBV</div>
-                        <div style="opacity: 0.9; font-size: 0.875rem;">مساعدك الدراسي الذكي</div>
-                    </div>
-
-                    <div class="ai-suggestions">
-                        <button class="suggestion-chip" onclick="app.sendAIMessage('مرحبا OBV!')">👋 تحية</button>
-                        <button class="suggestion-chip" onclick="app.sendAIMessage('عندي اختبار قريب وخايف')">😰 خوف</button>
-                        <button class="suggestion-chip" onclick="app.sendAIMessage('ما عندي طاقة للمذاكرة')">😴 تعب</button>
-                        <button class="suggestion-chip" onclick="app.sendAIMessage('حاسس إني فاشل')">😔 إحباط</button>
-                        <button class="suggestion-chip" onclick="app.sendAIMessage('نصيحتك للنجاح')">🎯 نصيحة</button>
-                        <button class="suggestion-chip" onclick="app.sendAIMessage('احكي لي نكتة')">😂 ترفيه</button>
-                    </div>
-
-                    <div class="ai-chat" id="ai-chat"></div>
+            <!-- Achievements Page -->
+            <section class="page" id="page-achievements">
+                <div class="achievements-header">
+                    <h2 class="title-gradient" style="font-size: 2.5rem; margin-bottom: 1rem;">🏆 إنجازاتي</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">اجمع الإنجازات وافتح الألقاب الحصرية</p>
                     
-                    <div class="typing-indicator hidden" id="typing-indicator">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                    </div>
-
-                    <div class="ai-input-area">
-                        <div class="ai-input-wrapper">
-                            <input type="text" id="ai-input" class="ai-input" placeholder="اكتب رسالتك..." onkeypress="app.handleAIKeyPress(event)">
-                            <button class="ai-send-btn" onclick="app.sendAIMessage()">إرسال 📤</button>
-                            <p id="reponse"></p>
+                    <div class="achievements-stats">
+                        <div class="achievement-stat">
+                            <div class="achievement-stat-value" id="unlocked-count">0</div>
+                            <div class="achievement-stat-label">مفتوح</div>
                         </div>
-                        <div class="ai-actions">
-                            <button class="ai-action-btn" onclick="app.clearAIChat()">🗑️ مسح</button>
-                            <button class="ai-action-btn" onclick="app.saveAIChat()">💾 حفظ</button>
+                        <div class="achievement-stat">
+                            <div class="achievement-stat-value" id="total-achievements">0</div>
+                            <div class="achievement-stat-label">الإجمالي</div>
+                        </div>
+                        <div class="achievement-stat">
+                            <div class="achievement-stat-value" id="rare-count">0</div>
+                            <div class="achievement-stat-label">نادر</div>
                         </div>
                     </div>
                 </div>
+
+                <div class="achievements-grid" id="achievements-grid"></div>
             </section>
 
         </main>
 
         <!-- Footer -->
-        <footer class="footer">
-            <p>made by OBV-tech</p>
-            <p style="margin-top: 0.5rem; font-size: 0.875rem; opacity: 0.7;">الإصدار 2.8</p>
+        <footer class="footer-pro">
+            <div class="footer-brand">🌱 مذاكرتي Pro</div>
+            <div class="footer-links">
+                <a href="#" class="footer-link" onclick="app.navigate('home')">الرئيسية</a>
+                <a href="#" class="footer-link" onclick="app.navigate('analytics')">التحليلات</a>
+                <a href="#" class="footer-link" onclick="app.navigate('achievements')">الإنجازات</a>
+                <a href="#" class="footer-link" onclick="app.showSettings()">الإعدادات</a>
+            </div>
+             <span class="footer-heart"></span> made to by OBV</p>
+            <p style="margin-top: 0.5rem; font-size: 0.875rem; opacity: 0.7;">الإصدار 3.0 Pro - </p>
         </footer>
 
-        <!-- Modal -->
-        <div class="modal-overlay" id="modal-overlay" onclick="app.closeModal(event)">
-            <div class="modal">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="modal-title"></h3>
-                    <button class="modal-close" onclick="app.closeModal()">✕</button>
+        <!-- Modals -->
+        <div class="modal-overlay-pro" id="modal-overlay" onclick="app.closeModal(event)">
+            <div class="modal-pro">
+                <div class="modal-header-pro">
+                    <h3 class="modal-title-pro" id="modal-title"></h3>
+                    <button class="modal-close-pro" onclick="app.closeModal()">✕</button>
                 </div>
                 <div id="modal-body"></div>
             </div>
         </div>
 
+        <!-- Achievement Unlock Modal -->
+        <div class="modal-overlay-pro" id="achievement-modal" onclick="app.closeAchievementModal(event)">
+            <div class="modal-pro" style="max-width: 450px;">
+                <div class="achievement-unlock-modal">
+                    <div class="achievement-unlock-icon" id="achievement-icon">🏆</div>
+                    <div class="achievement-unlock-title">إنجاز جديد!</div>
+                    <div class="achievement-unlock-name" id="achievement-name"></div>
+                    <p id="achievement-desc" style="color: var(--text-muted); margin-bottom: 1.5rem;"></p>
+                    <button class="btn-primary-pro" onclick="app.closeAchievementModal()">
+                        <span>🎉</span> رائع!
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Toast Container -->
-        <div class="toast-container" id="toast-container"></div>
+        <div class="toast-container-pro" id="toast-container"></div>
 
     </div>
-    <script src="https://js.puter.com/v2/"></script>
-    <script src="app.js"></script>
+
+    <script src="script.js"></script>
 </body>
 </html>
